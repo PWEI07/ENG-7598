@@ -8,6 +8,7 @@ from threading import Thread
 import rqdatac as rd
 # import rqfactor
 # from rqfactor import Factor
+from datetime import timedelta
 from datetime import datetime
 # from bokeh.io import output_notebook
 rd.init()
@@ -86,7 +87,8 @@ class GuBa(object):
         ).json()
         return data0
 
-    def daily_factor(self, dates):
+    def daily_factor(self, start, end):
+        dates = rd.get_trading_dates(start, end)
         all_data = []
         for date in dates:
             all_data = all_data + self.__daily_factor_1_day(str(date))
@@ -159,3 +161,14 @@ class GuBa(object):
     #                                             neutralization='industry', include_st=False, include_new=False)
     #     GuBa.show_analysis(optimal_test_analysis)
     #     return optimal_period, optimal_validation_analysis, optimal_test_analysis
+
+    def update_daily_factor(self, data):
+        data_last_date = list(data['date'])[-1]
+        data_last_date = datetime.strptime(data_last_date, '%Y-%m-%d')
+        data_last_date += timedelta(days=1)
+        data_last_date = str(data_last_date.date())
+        today = str(datetime.now().date())
+        added_data = self.daily_factor(data_last_date, today)
+        result = data.append(added_data)
+        return result
+

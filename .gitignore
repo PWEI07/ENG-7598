@@ -6,3 +6,7 @@
 *.idea
 *.rar
 *.zip
+.gitignore
+*.xlsx
+*.tmp
+my_data

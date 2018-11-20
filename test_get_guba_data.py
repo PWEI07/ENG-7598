@@ -36,5 +36,13 @@ sentiments_2 = selected_active_stocks(sentiment_factor, 'sentiment_index')
 sentiments_2.to_pickle('F://ricequant_internship//ENG-7598//my_data//sentiments_1112.pkl')
 
 # data0 = guba1.__daily_factor_1_day('2017-10-08')
+# =================================================================
+
+sentiment_data = pd.read_pickle('F://ricequant_internship//ENG-7598//my_data//sentiment_data.pkl')
+
+
+
+
+
 
 
