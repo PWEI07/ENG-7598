@@ -88,9 +88,13 @@ class GuBa(object):
         return data0
 
     def daily_factor(self, start, end):
-        dates = rd.get_trading_dates(start, end)
+        temp_start = datetime.strptime(start, '%Y-%m-%d').date()
+        temp_end = datetime.strptime(end, '%Y-%m-%d').date()
+        temp_delta = temp_end - temp_start
+        #         dates = rd.get_trading_dates(start, end)
         all_data = []
-        for date in dates:
+        for i in range(temp_delta.days + 1):
+            date = temp_start + timedelta(i)
             all_data = all_data + self.__daily_factor_1_day(str(date))
         all_data = pd.DataFrame(all_data)
         all_data.drop(['stock_name'], axis='columns', inplace=True)
@@ -99,6 +103,12 @@ class GuBa(object):
     @staticmethod
     def factor_format(df, col_name):
         df1 = df[['date', col_name, 'stock_code']].copy()
+
+        # 将所有舆情数据对应到下一个交易日（节假日期间的舆情数据被除以天数以取到平均值）
+        df1['date'] = list(map(lambda x: str(rd.get_next_trading_date(x)), df1['date']))
+        df1 = df1.groupby(['date', 'stock_code'])[col_name].apply(
+            np.mean).reset_index()
+
         df1 = df1.pivot(index='date', columns='stock_code', values=col_name)
         stock_codes = []
         original_stock_codes = []
