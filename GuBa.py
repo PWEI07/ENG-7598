@@ -6,6 +6,7 @@ import time
 import sched
 from threading import Thread
 import rqdatac as rd
+import itertools
 # import rqfactor
 # from rqfactor import Factor
 from datetime import timedelta
@@ -27,7 +28,7 @@ class GuBa(object):
         self.schedule = sched.scheduler(time.time, time.sleep)
         th = Thread(target=self.__reconnect)
         th.start()
-        time.sleep(1.0)
+        time.sleep(4.0)
         # 关于2018年1月1日活跃的普通股
 
     def __reconnect(self):
@@ -60,19 +61,27 @@ class GuBa(object):
         ).json()
         return result
 
-    def hourly_factor(self, dates):
+    def hourly_factor(self, start, end):
         all_data = []
-        for date in dates:
+        temp_start = datetime.strptime(start, '%Y-%m-%d').date()
+        temp_end = datetime.strptime(end, '%Y-%m-%d').date()
+        temp_delta = temp_end - temp_start
+        for i in range(1 + temp_delta.days):
+            date = temp_start + timedelta(i)
             all_data = all_data + self.__hourly_factor_1_day(str(date))
-
-        all_hourly_data = []
-        all_stock_code = []
-
-        for data in all_data:
-            all_hourly_data = all_hourly_data + data['sentiment_index_hourly']
-            all_stock_code = all_stock_code + [data['stock_code']] * len(data['sentiment_index_hourly'])
-        all_data = pd.DataFrame(all_hourly_data)
-        all_data['stock_code'] = all_stock_code
+        # all_hourly_data = []
+        # all_stock_code = []
+        temp1 = [d['sentiment_index_hourly'] for d in all_data]
+        temp_sentiment_data = [t for T in temp1 for t in T]
+        # temp_sentiment_data = list(itertools.chain.from_iterable(all_data))
+        temp_stock_code = [d['stock_code'] for d in all_data]
+        temp_stock_code_times = list(map(lambda x: len(x['sentiment_index_hourly']), all_data))
+        temp_stock_code1 = np.repeat(temp_stock_code, temp_stock_code_times)
+        # for data in all_data:
+        #     all_hourly_data = all_hourly_data + data['sentiment_index_hourly']
+        #     all_stock_code = all_stock_code + [data['stock_code']] * len(data['sentiment_index_hourly'])
+        all_data = pd.DataFrame(temp_sentiment_data)
+        all_data['stock_code'] = temp_stock_code1
         return all_data
 
     def __daily_factor_1_day(self, date):
