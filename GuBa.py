@@ -6,7 +6,6 @@ import time
 import sched
 from threading import Thread
 import rqdatac as rd
-import itertools
 # import rqfactor
 # from rqfactor import Factor
 from datetime import timedelta

@@ -22,4 +22,24 @@ def test_guba_hourly_data():
 test_result = test_guba_hourly_data()
 
 
+guba1 = GuBa()
+daily_1128 = guba1.daily_factor('2018-11-28', '2018-11-28')
 
+test_hour = requests.post(
+            url='https://api.ssymmetry.com/api/gub/sentiment/hour',
+            data=json.dumps({
+                'start': '2018-11-28 01:00:00',
+                'end': '2018-11-28 12:00:00'
+            }),
+            headers={
+                'Authorization': guba1.cookies
+            }
+        ).json()
+
+date_time = None
+date_time is None
+current_time = datetime.now()
+previous_time = current_time - timedelta(hours=2)
+previous_time = previous_time - timedelta(minutes=previous_time.minute,
+                                          seconds=previous_time.second)
+previous_time.strftime('%Y-%m-%d %H:%M:%S')
